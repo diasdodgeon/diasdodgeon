@@ -9,7 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
-    header { position: relative; background: url('banner4.JPG') center/cover no-repeat; color: white; text-align: center; min-height: 236px; display: flex; align-items: center; justify-content: center; }
+    header { position: relative; background: url('banner3.JPG') center/cover no-repeat; color: white; text-align: center; min-height: 236px; display: flex; align-items: center; justify-content: center; }
     header h1 { background: rgba(0, 0, 0, 0.5); padding: 0.5rem 1rem; border-radius: 8px; }
     #add-form, #search-bar, #tag-menu { max-width: 800px; margin: 1rem auto; background: #fff; padding: 1rem; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
     #add-form input, #add-form textarea, #search-bar input { width: 100%; margin-bottom: 0.5rem; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
@@ -137,6 +137,35 @@
       renderGallery();
     }));
 
+        // --- Helper para ler parâmetros da URL ---
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+    
+    // --- Ao carregar a página, checa se veio algo via bookmarklet ---
+    window.addEventListener('DOMContentLoaded', async () => {
+      const link  = getParam('link');
+      const thumb = getParam('thumb');
+    
+      if (link && thumb) {
+        // opcionalmente você pode ler desc e frames também
+        const desc   = getParam('desc')   || '';
+        const frames = getParam('frames') ? getParam('frames').split(',') : [];
+    
+        // chama diretamente o addItem do Firestore
+        await addItem({ videoLink: decodeURIComponent(link),
+                        thumbUrl:   decodeURIComponent(thumb),
+                        desc:       decodeURIComponent(desc),
+                        frameUrls:  frames.map(f=>decodeURIComponent(f)) });
+        // limpa os params para não duplicar ao recarregar
+        history.replaceState(null, '', window.location.pathname);
+      }
+    
+      // por fim, renderiza normalmente
+      renderGallery();
+    });
+
+    
     window.addEventListener('DOMContentLoaded', renderGallery);
   </script>
 </body>
