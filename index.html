@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Galeria de Vídeos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    header {
+      position: relative;
+      background: #333;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    header {
+      background: url('banner.JPG') center/cover no-repeat;
+      min-height: 236px;
+      …
+    }
+
+    #add-form, #search-bar, #tag-menu {
+      max-width: 800px;
+      margin: 1rem auto;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    #add-form input,
+    #add-form textarea,
+    #search-bar input {
+      width: 100%;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #add-form button {
+      display: block;
+      margin-top: 0.5rem;
+      padding: 0.7rem 1.2rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #tag-menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .tag-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    #gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      max-width: 1000px;
+      margin: 1rem auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+    .card img.thumbnail {
+      width: 100%;
+      display: block;
+      cursor: pointer;
+    }
+    .card .info {
+      padding: 0.8rem;
+      flex: 1;
+    }
+    .card .frames {
+      display: flex;
+      gap: 0.3rem;
+      margin: 0.5rem 0;
+    }
+    .card .frames img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .card .description {
+      font-size: 0.9rem;
+      color: #333;
+    }
+    .remove-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem;
+      margin: 0.8rem;
+      cursor: pointer;
+      align-self: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Minha Galeria de Vídeos</h1>
+    
+  </header>
+
+  <section id="add-form">
+    <h2>Adicionar Novo Vídeo</h2>
+    <input type="text" id="thumb-url" placeholder="URL da Thumbnail" />
+    <input type="text" id="video-link" placeholder="Link do Vídeo/Filme" />
+    <textarea id="description" rows="2" placeholder="Breve descrição"></textarea>
+    <input type="text" id="frames" placeholder="URLs dos frames (separados por vírgula)" />
+    <button id="add-btn">Adicionar</button>
+  </section>
+
+  <section id="search-bar">
+    <input type="text" id="search-input" placeholder="Buscar por descrição..." />
+  </section>
+
+  <section id="tag-menu">
+    <button class="tag-btn" data-tag="bunda grande">bunda grande</button>
+    <button class="tag-btn" data-tag="big ass">big ass</button>
+    <button class="tag-btn" data-tag="fart">Fart</button>
+    <button class="tag-btn" data-tag="peido">peido</button>
+    <button class="tag-btn" data-tag="musica pra tranzar">musica pra tranzar</button>
+  </section>
+
+  <section id="gallery"></section>
+
+  <script>
+    const STORAGE_KEY = 'videoGalleryItems';
+
+    function loadItems() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveItems(items) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    }
+
+    function renderGallery() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      const items = loadItems();
+      const filter = document.getElementById('search-input').value.trim().toLowerCase();
+
+      items.forEach((item, index) => {
+        if (filter && !item.desc.toLowerCase().includes(filter)) return;
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const a = document.createElement('a');
+        a.href = item.videoLink;
+        a.target = '_blank';
+        const thumbImg = document.createElement('img');
+        thumbImg.src = item.thumbUrl;
+        thumbImg.alt = item.desc;
+        thumbImg.className = 'thumbnail';
+        a.appendChild(thumbImg);
+        card.appendChild(a);
+
+        const info = document.createElement('div');
+        info.className = 'info';
+
+        if (item.frameUrls.length) {
+          const framesDiv = document.createElement('div');
+          framesDiv.className = 'frames';
+          item.frameUrls.forEach(u => {
+            const fimg = document.createElement('img');
+            fimg.src = u;
+            framesDiv.appendChild(fimg);
+          });
+          info.appendChild(framesDiv);
+        }
+
+        if (item.desc) {
+          const p = document.createElement('p');
+          p.className = 'description';
+          p.textContent = item.desc;
+          info.appendChild(p);
+        }
+
+        card.appendChild(info);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remover';
+        removeBtn.className = 'remove-btn';
+        removeBtn.addEventListener('click', () => {
+          const items = loadItems();
+          items.splice(index, 1);
+          saveItems(items);
+          renderGallery();
+        });
+        card.appendChild(removeBtn);
+
+        gallery.appendChild(card);
+      });
+    }
+
+    document.getElementById('add-btn').addEventListener('click', () => {
+      const thumbUrl = document.getElementById('thumb-url').value.trim();
+      const videoLink = document.getElementById('video-link').value.trim();
+      const desc = document.getElementById('description').value.trim();
+      const framesInput = document.getElementById('frames').value.trim();
+
+      if (!thumbUrl || !videoLink) {
+        alert('Thumbnail e link do vídeo são obrigatórios.');
+        return;
+      }
+
+      const frameUrls = framesInput ? framesInput.split(',').map(u => u.trim()) : [];
+      const items = loadItems();
+      items.push({ thumbUrl, videoLink, desc, frameUrls });
+      saveItems(items);
+      renderGallery();
+
+      document.getElementById('thumb-url').value = '';
+      document.getElementById('video-link').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('frames').value = '';
+    });
+
+    document.getElementById('search-input').addEventListener('input', renderGallery);
+
+    // atalho por tags
+    document.querySelectorAll('.tag-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.getAttribute('data-tag');
+        document.getElementById('search-input').value = tag;
+        renderGallery();
+      });
+    });
+
+    window.addEventListener('DOMContentLoaded', renderGallery);
+  </script>
+</body>
+</html>
