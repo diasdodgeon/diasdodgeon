@@ -137,35 +137,7 @@
       renderGallery();
     }));
 
-        // --- Helper para ler parâmetros da URL ---
-    function getParam(name) {
-      return new URLSearchParams(window.location.search).get(name);
-    }
-    
-    // --- Ao carregar a página, checa se veio algo via bookmarklet ---
-    window.addEventListener('DOMContentLoaded', async () => {
-      const link  = getParam('link');
-      const thumb = getParam('thumb');
-    
-      if (link && thumb) {
-        // opcionalmente você pode ler desc e frames também
-        const desc   = getParam('desc')   || '';
-        const frames = getParam('frames') ? getParam('frames').split(',') : [];
-    
-        // chama diretamente o addItem do Firestore
-        await addItem({ videoLink: decodeURIComponent(link),
-                        thumbUrl:   decodeURIComponent(thumb),
-                        desc:       decodeURIComponent(desc),
-                        frameUrls:  frames.map(f=>decodeURIComponent(f)) });
-        // limpa os params para não duplicar ao recarregar
-        history.replaceState(null, '', window.location.pathname);
-      }
-    
-      // por fim, renderiza normalmente
-      renderGallery();
-    });
-
-    
+  
     window.addEventListener('DOMContentLoaded', renderGallery);
   </script>
 </body>
